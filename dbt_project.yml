@@ -1,0 +1,39 @@
+name: market_pulse
+version: "1.0.0"
+config-version: 2
+profile: market_pulse
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  market_pulse:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      core:
+        +schema: core
+      reporting:
+        +schema: reporting
+
+seeds:
+  market_pulse:
+    +schema: reference
+
+vars:
+  # reporting history starts here (the VIX begins in 1990)
+  report_start: "1990-01-01"
+  # VIX regime cut-offs (monthly average close)
+  vix_calm_below: 15
+  vix_elevated_at: 20
+  vix_stress_at: 30

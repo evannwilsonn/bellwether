@@ -1,0 +1,3 @@
+dbt-duckdb>=1.9,<2
+duckdb>=1.1
+# for running against Snowflake:  pip install dbt-snowflake

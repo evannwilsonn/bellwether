@@ -1,0 +1,17 @@
+version: 2
+seeds:
+  - name: series
+    description: >
+      Series catalog. One row per market or macro series in the warehouse, with its unit,
+      native frequency, publisher and how stale it may get before the coverage test fails.
+      Annual-ish Shiller fundamentals get a long window because S&P publishes earnings with a lag.
+    config:
+      column_types:
+        max_staleness_days: integer
+    columns:
+      - name: series_id
+        data_tests: [unique, not_null]
+      - name: native_frequency
+        data_tests:
+          - accepted_values:
+              arguments: {values: [daily, monthly]}

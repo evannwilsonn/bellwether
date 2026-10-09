@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Market Pulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f8f9fb;--line:#e3e5ea;--line-2:#d3d6dd;
+  --text:#14161c;--text-2:#4a4f5c;--text-3:#767b88;
+  --s1:#2a6fdb;--s2:#a8630f;--s3:#16865a;--up:#16865a;--down:#c2412d;--focus:#2a6fdb;
+  --shade:rgba(194,65,45,.09);
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
+  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;--shade:rgba(255,122,107,.10)}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
+  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;--shade:rgba(255,122,107,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--font)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1320px;margin:0 auto;padding:24px 20px 48px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.brand h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand p{margin:4px 0 0;color:var(--text-2);font-size:14px;max-width:62ch}
+.badge{display:inline-block;margin-left:8px;font:500 11px var(--mono);color:var(--text-3);border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;vertical-align:3px}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{font:500 13px var(--font);color:var(--text-2);background:none;border:0;border-radius:7px;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.kpi .lbl{margin:0;font-size:13px;font-weight:500;color:var(--text-2)}
+.kpi .v{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12.5px;color:var(--text-3)}
+.kpi .d b{font-weight:600}.up{color:var(--up)}.down{color:var(--down)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.card header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.card h2{margin:0;font-size:15px;font-weight:600}
+.card .sub{font-size:12.5px;color:var(--text-3)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text-2)}
+.legend i{display:inline-block;width:14px;height:2px;border-radius:2px;margin-right:6px;vertical-align:3px}
+.legend i.box{height:10px;width:10px;vertical-align:-1px;background:var(--shade);border:1px solid var(--down)}
+.plot{position:relative}
+.plot svg{display:block;width:100%;height:auto;overflow:visible}
+.ax{font:11px var(--font);fill:var(--text-3)}
+.gridl{stroke:var(--line);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:nowrap;opacity:0;transform:translate(-50%,calc(-100% - 12px));transition:opacity .12s;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.tip.on{opacity:1}.tip b{font-weight:600}.tip span{color:var(--text-2)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-weight:500;color:var(--text-3);text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);font-size:12px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .wbar{display:inline-block;height:8px;border-radius:3px;background:var(--s1);vertical-align:0;margin-right:8px}
+.full{grid-column:1/-1}
+.note{margin:10px 0 0;font-size:12.5px;color:var(--text-3)}
+.dq{margin:0;padding:0;list-style:none;font-size:13.5px}
+.dq li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.dq li:last-child{border-bottom:0}
+.dq b{font:600 15px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.dq span{color:var(--text-2)}
+footer.lin{margin-top:18px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+footer.lin code{font-family:var(--mono);font-size:12px;color:var(--text-2)}
+footer.lin a{color:var(--text-2)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}}
+@media (max-width:560px){.kpis{grid-template-columns:1fr}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Market Pulse <span class="badge">Public data</span></h1>
+      <p id="subtitle">U.S. markets and macro, monthly · loading…</p>
+    </div>
+    <div class="seg" role="group" aria-label="Date range">
+      <button type="button" data-r="60" aria-pressed="false">5 years</button>
+      <button type="button" data-r="120" aria-pressed="false">10 years</button>
+      <button type="button" data-r="all" aria-pressed="true">Since 1990</button>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Latest readings"></section>
+
+  <section class="grid">
+    <article class="card full">
+      <header><h2>S&amp;P 500, log scale</h2>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Monthly average level</span><span><i class="box"></i>Bear market (20%+ below peak)</span></div></header>
+      <div class="plot" id="spx"></div>
+    </article>
+    <article class="card">
+      <header><h2>Drawdown from prior peak</h2><span class="sub">How far below its all-time high the index sat</span></header>
+      <div class="plot" id="dd"></div>
+    </article>
+    <article class="card">
+      <header><h2>Volatility (VIX)</h2>
+        <div class="legend"><span><i style="background:var(--s2)"></i>Monthly average</span><span><i style="background:var(--text-3)"></i>Regime lines at 15 / 20 / 30</span></div></header>
+      <div class="plot" id="vix"></div>
+    </article>
+    <article class="card">
+      <header><h2>Rates and inflation</h2>
+        <div class="legend"><span><i style="background:var(--s1)"></i>10-year Treasury</span><span><i style="background:var(--s2)"></i>CPI, year over year</span><span><i style="background:var(--s3)"></i>Real 10-year</span></div></header>
+      <div class="plot" id="rates"></div>
+    </article>
+    <article class="card">
+      <header><h2>WTI crude, nominal vs. today's dollars</h2>
+        <div class="legend"><span><i style="background:var(--s2)"></i>Nominal</span><span><i style="background:var(--s1)"></i>Inflation-adjusted</span></div></header>
+      <div class="plot" id="oil"></div>
+    </article>
+    <article class="card">
+      <header><h2>Valuation: Shiller CAPE</h2>
+        <div class="legend"><span><i style="background:var(--s1)"></i>CAPE (PE10)</span><span><i style="background:var(--s3)"></i>Excess CAPE yield, %</span></div></header>
+      <div class="plot" id="cape"></div>
+      <p class="note" id="capeNote"></p>
+    </article>
+    <article class="card">
+      <header><h2>Gold, nominal vs. today's dollars</h2>
+        <div class="legend"><span><i style="background:var(--s2)"></i>Nominal</span><span><i style="background:var(--s1)"></i>Inflation-adjusted</span></div></header>
+      <div class="plot" id="gold"></div>
+    </article>
+    <article class="card full">
+      <header><h2>Sector valuation</h2><span class="sub">Current S&amp;P 500 members in the company snapshot. Aggregate P/E = total market cap ÷ total earnings.</span></header>
+      <div style="overflow-x:auto"><table id="sectors"></table></div>
+    </article>
+    <article class="card">
+      <header><h2>What the pipeline cleaned up</h2><span class="sub">Counted from the warehouse on every build</span></header>
+      <ul class="dq" id="dq"></ul>
+    </article>
+    <article class="card">
+      <header><h2>Sources</h2><span class="sub">Public domain (ODC-PDDL) via DataHub</span></header>
+      <div style="overflow-x:auto"><table id="sources"></table></div>
+    </article>
+  </section>
+
+  <footer class="lin" id="lineage"></footer>
+</div>
+
+<script>
+(async function(){
+const D = window.MP_DATA || await fetch('data.json').then(r=>r.json());
+const $ = id => document.getElementById(id);
+const C = D.month_columns;
+const all = D.months.map(r=>Object.fromEntries(C.map((c,i)=>[c,r[i]])));
+const sectors = D.sectors.map(r=>Object.fromEntries(D.sector_columns.map((c,i)=>[c,r[i]])));
+let range = 'all';
+
+const mLabel = (m,long) => new Date(m.slice(0,7)+'-15').toLocaleDateString('en-US',long?{month:'short',year:'numeric'}:{month:'short',year:'2-digit'});
+const yLabel = m => m.slice(0,4);
+const pct = (v,d=1) => v==null?'–':(v*100).toFixed(d)+'%';
+const signPct = (v,d=1) => v==null?'–':(v>0?'+':'')+(v*100).toFixed(d)+'%';
+const num = (v,d=0) => v==null?'–':v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd = (v,d=2) => v==null?'–':'$'+num(v,d);
+const big = v => v>=1e12?'$'+(v/1e12).toFixed(2)+'T':'$'+(v/1e9).toFixed(0)+'B';
+const latest = k => { for(let i=all.length-1;i>=0;i--) if(all[i][k]!=null) return all[i]; return null; };
+
+function rows(){ return range==='all' ? all : all.slice(-Number(range)); }
+
+function renderKpis(){
+  const s=latest('sp500_level'), r=latest('sp500_real_ret_12m'), v=latest('vix_avg'), t=latest('real_10y_pct'), o=latest('wti_avg');
+  const k=[
+    ['S&P 500', num(s.sp500_level), `<b class="${s.sp500_ret_12m>=0?'up':'down'}">${signPct(s.sp500_ret_12m)}</b> over 12 months · ${mLabel(s.month_start)}`],
+    ['Real 12-month return', signPct(r.sp500_real_ret_12m), `After CPI inflation · ${mLabel(r.month_start)}`],
+    ['Below all-time high', pct(-s.sp500_drawdown), `${s.market_phase} · ${mLabel(s.month_start)}`],
+    ['VIX, monthly average', num(v.vix_avg,1), `${v.volatility_regime} regime · ${mLabel(v.month_start)}`],
+    ['Real 10-year yield', num(t.real_10y_pct,2)+'%', `${num(t.ust10y_pct,2)}% nominal − ${num(t.cpi_yoy_pct,1)}% CPI · ${mLabel(t.month_start)}`],
+  ];
+  $('kpis').innerHTML=k.map(([l,v,d])=>`<div class="kpi"><div class="lbl">${l}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+  const f=all[0].month_start, last=s.month_start;
+  $('subtitle').textContent=`U.S. markets and macro, monthly · ${mLabel(f,1)} to ${mLabel(last,1)} · WTI ${usd(o.wti_avg)} · gold ${usd(latest('gold_avg').gold_avg,0)}/oz`;
+}
+
+function tipEl(host){let t=host.querySelector('.tip');if(!t){t=document.createElement('div');t.className='tip';host.appendChild(t)}return t}
+function ticks(lo,hi,n=4){const raw=(hi-lo)/n,mg=Math.pow(10,Math.floor(Math.log10(raw))),st=[1,2,2.5,5,10].map(k=>k*mg).find(k=>k>=raw);const a=Math.floor(lo/st)*st,out=[];for(let v=a;v<=hi+st*.5;v+=st)out.push(+v.toFixed(10));return out}
+
+/* One line chart for every panel. opts: series [{k,color,label,fmt,area}], fmt (axis), log, shade (row => bool), refs [values], zero */
+function chart(host, data, o){
+  const W=Math.max(300,host.clientWidth||640), H=o.h||(W<500?210:240), L=o.L||52, R=12, T=10, B=26, n=data.length;
+  const vals=data.flatMap(d=>o.series.map(s=>d[s.k])).filter(v=>v!=null).concat(o.refs||[]).concat(o.zero?[0]:[]);
+  let lo=Math.min(...vals), hi=Math.max(...vals);
+  let y, tk;
+  if(o.log){ const a=Math.log10(lo*.95), b=Math.log10(hi*1.05); y=v=>T+(H-T-B)*(1-(Math.log10(v)-a)/(b-a));
+    tk=[]; for(let e=Math.floor(a);e<=Math.ceil(b);e++) for(const m of [1,2,5]){const v=m*Math.pow(10,e); if(Math.log10(v)>=a&&Math.log10(v)<=b) tk.push(v)}
+    if(tk.length>6) tk=tk.filter(v=>String(v)[0]==='1'||String(v)[0]==='5'); }
+  else { tk=ticks(lo,hi); lo=tk[0]; hi=tk[tk.length-1]; y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo)); }
+  const x=i=>L+(W-L-R)*(n===1?.5:i/(n-1)), bw=(W-L-R)/Math.max(1,n-1);
+  let g='';
+  if(o.shade){ let st=null; data.forEach((d,i)=>{ const on=o.shade(d); if(on&&st===null) st=i; if((!on||i===n-1)&&st!==null){ const e=on?i:i-1; g+=`<rect x="${(x(st)-bw/2).toFixed(1)}" y="${T}" width="${(x(e)-x(st)+bw).toFixed(1)}" height="${H-T-B}" fill="var(--shade)"/>`; st=null; } }); }
+  for(const v of tk) g+=`<line class="gridl" x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="ax" x="${L-8}" y="${(y(v)+4).toFixed(1)}" text-anchor="end">${o.fmt(v)}</text>`;
+  for(const v of (o.refs||[])) g+=`<line x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--text-3)" stroke-dasharray="3 4" stroke-width="1"/>`;
+  if(o.zero&&!o.log) g+=`<line x1="${L}" x2="${W-R}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}" stroke="var(--line-2)" stroke-width="1.5"/>`;
+  const years=n>36, step=Math.max(1,Math.ceil(n/(W<500?5:8)/(years?12:1))*(years?12:1));
+  let labs=''; data.forEach((d,i)=>{ const ok=years?d.month_start.slice(5,7)==='01'&&(+d.month_start.slice(0,4))%Math.max(1,step/12)===0:i%step===0; if(ok&&x(i)>L+14&&x(i)<W-R-14) labs+=`<text class="ax" x="${x(i).toFixed(1)}" y="${H-7}" text-anchor="middle">${years?yLabel(d.month_start):mLabel(d.month_start)}</text>` });
+  let paths='';
+  for(const s of o.series){
+    let p='', pen=false; data.forEach((d,i)=>{ const v=d[s.k]; if(v==null||(o.log&&v<=0)){pen=false;return} p+=(pen?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1); pen=true; });
+    if(s.area){ const base=y(o.zero?0:lo); const segs=p.split('M').filter(Boolean); for(const sg of segs){ const pts=sg.split('L'); const x0=pts[0].split(' ')[0], x1=pts[pts.length-1].split(' ')[0]; paths+=`<path d="M${x0} ${base}L${sg}L${x1} ${base}Z" fill="${s.color}" opacity=".16"/>`; } }
+    paths+=`<path d="${p}" fill="none" stroke="${s.color}" stroke-width="${s.w||2}" stroke-linejoin="round"/>`;
+  }
+  const dots=o.series.map((s,j)=>`<circle data-j="${j}" r="4" fill="${s.color}" stroke="var(--surface)" stroke-width="2" opacity="0"/>`).join('');
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">${g}${labs}${paths}<line class="xh" y1="${T}" y2="${H-B}" stroke="var(--line-2)" opacity="0"/>${dots}<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent" class="hit"/></svg>`;
+  const sv=host.querySelector('svg'), tp=tipEl(host), xh=sv.querySelector('.xh'), ds=[...sv.querySelectorAll('circle')];
+  sv.querySelector('.hit').addEventListener('pointermove',e=>{
+    const r=sv.getBoundingClientRect(), px=(e.clientX-r.left)/r.width*W, i=Math.max(0,Math.min(n-1,Math.round((px-L)/(W-L-R)*(n-1)))), d=data[i];
+    xh.setAttribute('x1',x(i)); xh.setAttribute('x2',x(i)); xh.setAttribute('opacity',1);
+    let top=H; o.series.forEach((s,j)=>{ const v=d[s.k]; if(v==null){ds[j].setAttribute('opacity',0);return} ds[j].setAttribute('cx',x(i)); ds[j].setAttribute('cy',y(v)); ds[j].setAttribute('opacity',1); top=Math.min(top,y(v)); });
+    tp.innerHTML=`<b>${mLabel(d.month_start,1)}</b>`+o.series.map(s=>`<br><span>${s.label}</span> ${(s.tf||o.fmt)(d[s.k])}`).join('')+(o.extra?o.extra(d):'');
+    tp.style.left=Math.min(Math.max(x(i)/W*r.width,90),r.width-90)+'px'; tp.style.top=(top/H*r.height)+'px'; tp.classList.add('on');
+  });
+  sv.querySelector('.hit').addEventListener('pointerleave',()=>{tp.classList.remove('on');xh.setAttribute('opacity',0);ds.forEach(c=>c.setAttribute('opacity',0))});
+}
+
+function renderCharts(){
+  const d=rows(), cs=getComputedStyle(document.documentElement), c1='var(--s1)', c2='var(--s2)', c3='var(--s3)';
+  chart($('spx'),d,{h:280,log:true,series:[{k:'sp500_level',color:c1,label:'S&P 500',tf:v=>num(v)}],fmt:v=>num(v),shade:r=>r.sp500_drawdown<=-.2,
+    extra:r=>`<br><span>vs. peak</span> ${pct(r.sp500_drawdown)} · ${r.market_phase}`,aria:'S&P 500 monthly level on a log scale with bear markets shaded'});
+  chart($('dd'),d,{series:[{k:'sp500_drawdown',color:'var(--down)',label:'Below peak',area:true}],fmt:v=>pct(v,0),zero:true,aria:'S&P 500 drawdown from prior peak'});
+  chart($('vix'),d,{series:[{k:'vix_avg',color:c2,label:'VIX average',tf:v=>num(v,1)},{k:'vix_high',color:'transparent',label:'Highest close',tf:v=>num(v,1)}],fmt:v=>num(v),refs:[15,20,30],
+    extra:r=>`<br><span>Regime</span> ${r.volatility_regime}`,aria:'VIX monthly average with regime lines'});
+  chart($('rates'),d,{series:[{k:'ust10y_pct',color:c1,label:'10-year',tf:v=>v==null?'–':num(v,2)+'%'},{k:'cpi_yoy_pct',color:c2,label:'CPI YoY',tf:v=>v==null?'–':num(v,1)+'%'},{k:'real_10y_pct',color:c3,label:'Real 10-year',tf:v=>v==null?'–':num(v,2)+'%'}],fmt:v=>num(v)+'%',zero:true,aria:'Ten-year Treasury yield, CPI inflation and real yield'});
+  chart($('oil'),d,{series:[{k:'wti_avg',color:c2,label:'Nominal',tf:v=>usd(v)},{k:'wti_avg_real',color:c1,label:"Today's $",tf:v=>usd(v)}],fmt:v=>'$'+num(v),zero:true,aria:'WTI crude oil nominal and inflation-adjusted'});
+  chart($('cape'),d,{series:[{k:'cape',color:c1,label:'CAPE',tf:v=>num(v,1)},{k:'excess_cape_yield_pct',color:c3,label:'Excess CAPE yield',tf:v=>v==null?'–':num(v,2)+'%'}],fmt:v=>num(v),zero:true,aria:'Shiller CAPE and excess CAPE yield'});
+  chart($('gold'),d,{series:[{k:'gold_avg',color:c2,label:'Nominal',tf:v=>usd(v,0)},{k:'gold_avg_real',color:c1,label:"Today's $",tf:v=>usd(v,0)}],fmt:v=>'$'+num(v),aria:'Gold nominal and inflation-adjusted'});
+}
+
+function renderStatic(){
+  const q=D.quality;
+  $('capeNote').textContent=`The public Shiller file last published CAPE for ${mLabel(q.cape_last_published,1)}. The pipeline keeps those months null instead of reading the zero padding as a real value, and a freshness test flags the gap on every build.`;
+  const mx=Math.max(...sectors.map(s=>s.index_weight));
+  $('sectors').innerHTML=`<thead><tr><th>Sector</th><th>Index weight</th><th class="hide-sm">Companies</th><th>Market cap</th><th>Aggregate P/E</th><th class="hide-sm">Median P/E</th><th>Dividend yield</th><th class="hide-sm">No positive earnings</th></tr></thead><tbody>`+
+    sectors.map(s=>`<tr><td>${s.gics_sector}</td><td><span class="wbar" style="width:${Math.max(3,s.index_weight/mx*90)}px"></span>${pct(s.index_weight)}</td><td class="hide-sm">${s.companies}</td><td>${big(s.market_cap_usd)}</td><td>${num(s.aggregate_pe,1)}</td><td class="hide-sm">${num(s.median_pe,1)}</td><td>${pct(s.cap_weighted_dividend_yield,2)}</td><td class="hide-sm">${pct(s.share_without_positive_earnings,0)}</td></tr>`).join('')+'</tbody>';
+  const items=[
+    [q.shiller_zero_padded_values,'Zero placeholders in the Shiller file turned into nulls, so unpublished months don’t read as a CAPE of 0'],
+    [q.empty_snapshot_rows_dropped,'Company snapshot rows with no figures at all, dropped in staging'],
+    [q.snapshot_companies_left_index,'Companies in the snapshot that have since left the index, kept but excluded from sector rollups'],
+    [q.current_members_without_snapshot,'Current members with no valuation data, listed in dim_companies with a flag'],
+    [q.negative_wti_days_kept,'Negative WTI print (April 20, 2020) kept on purpose: it really happened'],
+    [q.blank_price_rows_dropped,'Blank holiday price rows dropped from the natural gas feed'],
+  ];
+  $('dq').innerHTML=items.map(([n,t])=>`<li><b>${num(n)}</b><span>${t}</span></li>`).join('');
+  $('sources').innerHTML=`<thead><tr><th>Raw table</th><th>Publisher</th><th>Rows</th></tr></thead><tbody>`+D.sources.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td><td>${num(s[2])}</td></tr>`).join('')+'</tbody>';
+  $('lineage').innerHTML=`Built from <code>reporting.rpt_market_monthly</code> and <code>reporting.rpt_sector_valuation</code> (dbt) · ${num(q.daily_rows)} daily and ${num(q.monthly_rows)} monthly observations · data exported ${D.generated} · <a href="https://github.com/evannwilsonn/market-pulse">github.com/evannwilsonn/market-pulse</a>. Not investment advice.`;
+}
+
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{range=b.dataset.r;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderCharts()}));
+let rt; addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderCharts,150)});
+renderKpis(); renderStatic(); renderCharts();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+version: 2
+
+models:
+  - name: stg_datahub__sp500_monthly
+    description: Shiller S&P 500 monthly file, typed, with unpublished zero padding turned into nulls.
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: sp500_level
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 1, max_value: 50000}
+      - name: cape
+        data_tests:
+          - value_between:
+              arguments: {min_value: 3, max_value: 60}
+
+  - name: stg_datahub__vix_daily
+    columns:
+      - name: observed_on
+        data_tests: [unique, not_null]
+      - name: vix_close
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 5, max_value: 100}
+
+  - name: stg_datahub__wti_daily
+    description: WTI spot. Negative prints are real (April 20, 2020) and kept on purpose.
+    columns:
+      - name: observed_on
+        data_tests: [unique, not_null]
+      - name: price_usd
+        data_tests:
+          - value_between:
+              arguments: {min_value: -50, max_value: 250}
+
+  - name: stg_datahub__brent_daily
+    columns:
+      - name: observed_on
+        data_tests: [unique, not_null]
+      - name: price_usd
+        data_tests:
+          - value_between:
+              arguments: {min_value: 5, max_value: 250}
+
+  - name: stg_datahub__henry_hub_daily
+    columns:
+      - name: observed_on
+        data_tests: [unique, not_null]
+      - name: price_usd
+        data_tests:
+          - value_between:
+              arguments: {min_value: 0, max_value: 50}
+
+  - name: stg_datahub__gold_monthly
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: gold_usd_oz
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 10, max_value: 20000}
+
+  - name: stg_datahub__ust10y_monthly
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: ust10y_pct
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 0, max_value: 20}
+
+  - name: stg_datahub__cpi_monthly
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: cpi_index
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 5, max_value: 1000}
+
+  - name: stg_datahub__sp500_constituents
+    columns:
+      - name: symbol
+        data_tests: [unique, not_null]
+      - name: gics_sector
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [Communication Services, Consumer Discretionary, Consumer Staples, Energy, Financials,
+                         Health Care, Industrials, Information Technology, Materials, Real Estate, Utilities]
+
+  - name: stg_datahub__sp500_financials
+    columns:
+      - name: symbol
+        data_tests: [unique, not_null]
+      - name: market_cap_usd
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: 0}
+      - name: pe_ratio
+        description: Null when earnings are negative or missing. Never zero.
+        data_tests:
+          - value_between:
+              arguments: {min_value: 0, max_value: 10000}

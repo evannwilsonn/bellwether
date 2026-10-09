@@ -1,0 +1,12 @@
+series_id,series_name,unit,native_frequency,publisher,category,max_staleness_days
+sp500,S&P 500 index (monthly average),index points,monthly,Robert Shiller / S&P,equities,62
+sp500_dividend,S&P 500 dividends (trailing 12m),index points,monthly,Robert Shiller / S&P,equities,1200
+sp500_earnings,S&P 500 earnings (trailing 12m),index points,monthly,Robert Shiller / S&P,equities,1200
+cape,Shiller CAPE (PE10),ratio,monthly,Robert Shiller / S&P,valuation,1200
+vix,CBOE Volatility Index (close),index points,daily,CBOE,volatility,30
+wti,WTI crude oil spot,USD per barrel,daily,U.S. EIA,commodities,30
+brent,Brent crude oil spot,USD per barrel,daily,U.S. EIA,commodities,30
+henry_hub,Henry Hub natural gas spot,USD per MMBtu,daily,U.S. EIA,commodities,30
+gold,Gold price (monthly average),USD per troy ounce,monthly,World Gold Council,commodities,62
+ust10y,U.S. 10-year Treasury yield,percent,monthly,Federal Reserve,rates,93
+cpi,U.S. CPI-U (all items),index 1982-84=100,monthly,U.S. BLS,inflation,93

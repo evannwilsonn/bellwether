@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: datahub
+    description: >
+      Public-domain market and macro series republished by the DataHub core-datasets project
+      (github.com/datasets). Landed by ingest/load_raw.py with every column as text plus audit columns.
+    schema: raw_datahub
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 7, period: day}
+      error_after: {count: 35, period: day}
+    tables:
+      - name: shiller_sp500_monthly
+        description: Robert Shiller's monthly S&P 500 file since 1871. Months not yet published are padded with 0.0, which staging turns into nulls.
+      - name: cboe_vix_daily
+        description: CBOE VIX daily open/high/low/close since 1990, six decimal places as text.
+      - name: eia_wti_daily
+        description: EIA WTI Cushing spot price. Includes the real negative print of April 20, 2020.
+      - name: eia_brent_daily
+        description: EIA Brent spot price.
+      - name: eia_henry_hub_daily
+        description: EIA Henry Hub natural gas spot price. Has a blank price on a holiday row.
+      - name: gold_monthly
+        description: Monthly average gold price since 1833. Dates are year-month only (YYYY-MM).
+      - name: fed_ust10y_monthly
+        description: U.S. 10-year Treasury constant-maturity yield, monthly.
+      - name: bls_cpi_monthly
+        description: CPI-U all items index (1982-84=100) with month-over-month inflation.
+      - name: sp500_constituents
+        description: Current S&P 500 members with GICS sector and sub-industry.
+      - name: sp500_financials
+        description: >
+          Point-in-time valuation snapshot per company. Older than the constituent list, so some
+          symbols have since left the index, and its "Sector" column actually holds the sub-industry.
+      - name: _extract_manifest
+        description: One row per extracted file with URL, row count and SHA-256, for lineage back to the source.
+        freshness: null

@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: dim_series
+    description: One row per series with metadata from the seed and coverage from the data.
+    columns:
+      - name: series_id
+        data_tests: [unique, not_null]
+      - name: last_month
+        description: Null would mean a cataloged series has no data at all.
+        data_tests: [not_null]
+
+  - name: fct_series_daily
+    description: Daily observations for VIX, WTI, Brent and Henry Hub, with day-over-day change.
+    data_tests:
+      - unique_combination:
+              arguments: {columns: [series_id, observed_on]}
+    columns:
+      - name: series_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_series'), field: series_id}
+
+  - name: fct_series_monthly
+    description: Every series at month grain (long format).
+    data_tests:
+      - unique_combination:
+              arguments: {columns: [series_id, month_start]}
+    columns:
+      - name: series_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_series'), field: series_id}
+      - name: observations
+        data_tests:
+          - value_between:
+              arguments: {min_value: 1, max_value: 23}
+
+  - name: fct_markets_monthly
+    description: Wide month table, one column per series, from the first S&P 500 month (1871).
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: sp500_level
+        data_tests: [not_null]
+
+  - name: dim_companies
+    description: Current S&P 500 members.
+    columns:
+      - name: symbol
+        data_tests: [unique, not_null]
+
+  - name: fct_company_valuation
+    description: Valuation snapshot per company, flagged for current index membership.
+    columns:
+      - name: symbol
+        data_tests: [unique, not_null]
+      - name: position_in_52w_range
+        data_tests:
+          - value_between:
+              arguments: {min_value: -0.05, max_value: 1.05}

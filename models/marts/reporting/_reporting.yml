@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: rpt_market_monthly
+    description: >
+      Monthly market scorecard since 1990. S&P 500 nominal and real returns, drawdown from the
+      prior peak, CAPE and excess CAPE yield, real 10-year yield, VIX regime, oil and gold in
+      today's dollars. Feeds the dashboard.
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+      - name: sp500_drawdown
+        data_tests:
+          - not_null
+          - value_between:
+              arguments: {min_value: -0.9, max_value: 0}
+      - name: sp500_ret_1m
+        data_tests:
+          - value_between:
+              arguments: {min_value: -0.35, max_value: 0.35}
+      - name: volatility_regime
+        data_tests:
+          - accepted_values:
+              arguments: {values: [Calm, Normal, Elevated, Stress]}
+      - name: market_phase
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [Near highs, Pullback, Correction, Bear market]}
+
+  - name: rpt_sector_valuation
+    description: Cap-weighted valuation by GICS sector from the company snapshot.
+    columns:
+      - name: gics_sector
+        data_tests: [unique, not_null]
+      - name: aggregate_pe
+        data_tests:
+          - value_between:
+              arguments: {min_value: 3, max_value: 150}
+
+exposures:
+  - name: market_pulse_dashboard
+    type: dashboard
+    maturity: medium
+    url: https://github.com/evannwilsonn/market-pulse/tree/main/dashboard
+    description: Single-page dashboard built from the two reporting marts.
+    depends_on:
+      - ref('rpt_market_monthly')
+      - ref('rpt_sector_valuation')
+    owner:
+      name: Evan Wilson
