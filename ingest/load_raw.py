@@ -19,7 +19,7 @@ import duckdb
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
-DB = ROOT / "warehouse" / "market_pulse.duckdb"
+DB = ROOT / "warehouse" / "bellwether.duckdb"
 SCHEMA = "raw_datahub"
 
 

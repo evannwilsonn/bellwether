@@ -1,10 +1,10 @@
-# Market Pulse
+# Bellwether: Markets & Macro Data Pipeline
 
 An end-to-end ELT pipeline on real public data. It **extracts** a set of financial market and macro series (S&P 500, VIX, oil, natural gas, gold, Treasury yields, CPI and S&P 500 company fundamentals), **loads** them untouched into a warehouse landing zone, and **transforms** them with dbt into a tested star schema and two reporting marts that feed a dashboard.
 
 It runs locally on DuckDB in about 15 seconds, and the same dbt project targets Snowflake.
 
-![Market Pulse dashboard](docs/dashboard.png)
+![Bellwether dashboard](docs/dashboard.png)
 
 ## What it answers
 
@@ -87,8 +87,8 @@ Public data is messier than it looks. Each of these is handled in code and count
 ## Run it
 
 ```bash
-git clone https://github.com/evannwilsonn/market-pulse.git
-cd market-pulse
+git clone https://github.com/evannwilsonn/bellwether.git
+cd bellwether
 python -m venv .venv && source .venv/bin/activate
 make setup     # pip install -r requirements.txt
 make all       # extract → load → dbt build → export dashboard data

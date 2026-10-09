@@ -1,7 +1,7 @@
-name: market_pulse
+name: bellwether
 version: "1.0.0"
 config-version: 2
-profile: market_pulse
+profile: bellwether
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -12,7 +12,7 @@ target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  market_pulse:
+  bellwether:
     staging:
       +materialized: view
       +schema: staging
@@ -27,7 +27,7 @@ models:
         +schema: reporting
 
 seeds:
-  market_pulse:
+  bellwether:
     +schema: reference
 
 vars:

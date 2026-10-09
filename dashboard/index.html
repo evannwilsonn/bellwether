@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Market Pulse</title>
+<title>Bellwether</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
@@ -76,7 +76,7 @@ footer.lin a{color:var(--text-2)}
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>Market Pulse <span class="badge">Public data</span></h1>
+      <h1>Bellwether <span class="badge">Public data</span></h1>
       <p id="subtitle">U.S. markets and macro, monthly · loading…</p>
     </div>
     <div class="seg" role="group" aria-label="Date range">
@@ -244,7 +244,7 @@ function renderStatic(){
   ];
   $('dq').innerHTML=items.map(([n,t])=>`<li><b>${num(n)}</b><span>${t}</span></li>`).join('');
   $('sources').innerHTML=`<thead><tr><th>Raw table</th><th>Publisher</th><th>Rows</th></tr></thead><tbody>`+D.sources.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td><td>${num(s[2])}</td></tr>`).join('')+'</tbody>';
-  $('lineage').innerHTML=`Built from <code>reporting.rpt_market_monthly</code> and <code>reporting.rpt_sector_valuation</code> (dbt) · ${num(q.daily_rows)} daily and ${num(q.monthly_rows)} monthly observations · data exported ${D.generated} · <a href="https://github.com/evannwilsonn/market-pulse">github.com/evannwilsonn/market-pulse</a>. Not investment advice.`;
+  $('lineage').innerHTML=`Built from <code>reporting.rpt_market_monthly</code> and <code>reporting.rpt_sector_valuation</code> (dbt) · ${num(q.daily_rows)} daily and ${num(q.monthly_rows)} monthly observations · data exported ${D.generated} · <a href="https://github.com/evannwilsonn/bellwether">github.com/evannwilsonn/bellwether</a>. Not investment advice.`;
 }
 
 document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{range=b.dataset.r;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderCharts()}));

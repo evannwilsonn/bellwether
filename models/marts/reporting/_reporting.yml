@@ -39,10 +39,10 @@ models:
               arguments: {min_value: 3, max_value: 150}
 
 exposures:
-  - name: market_pulse_dashboard
+  - name: bellwether_dashboard
     type: dashboard
     maturity: medium
-    url: https://github.com/evannwilsonn/market-pulse/tree/main/dashboard
+    url: https://github.com/evannwilsonn/bellwether/tree/main/dashboard
     description: Single-page dashboard built from the two reporting marts.
     depends_on:
       - ref('rpt_market_monthly')

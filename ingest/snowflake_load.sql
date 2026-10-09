@@ -4,8 +4,8 @@
 --      snowsql -a <account> -u <user> -f ingest/snowflake_load.sql
 -- Every column lands as VARCHAR, plus the same audit columns, and dbt does the typing.
 
-create database if not exists market_pulse;
-use database market_pulse;
+create database if not exists bellwether;
+use database bellwether;
 create schema if not exists raw_datahub;
 use schema raw_datahub;
 

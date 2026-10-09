@@ -44,7 +44,7 @@ SOURCES = [
 def fetch(url: str, attempts: int = 4) -> bytes:
     for i in range(attempts):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "market-pulse-extract/1.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "bellwether-extract/1.0"})
             with urllib.request.urlopen(req, timeout=60) as r:
                 return r.read()
         except Exception as exc:  # network blips: back off and retry
