@@ -50,6 +50,8 @@ def main() -> None:
         "snapshot_companies_left_index": q("select count(*) from core.fct_company_valuation where not in_current_index")[0][0],
         "current_members_without_snapshot": q("select count(*) from core.dim_companies where not has_valuation_snapshot")[0][0],
         "negative_wti_days_kept": q("select count(*) from staging.stg_datahub__wti_daily where price_usd < 0")[0][0],
+        "wti_lowest_price": q("select min(price_usd) from staging.stg_datahub__wti_daily")[0][0],
+        "wti_lowest_on": str(q("select observed_on from staging.stg_datahub__wti_daily order by price_usd limit 1")[0][0]),
         "cape_last_published": str(q("select max(month_start) from staging.stg_datahub__sp500_monthly where cape is not null")[0][0]),
         "daily_rows": q("select count(*) from core.fct_series_daily")[0][0],
         "monthly_rows": q("select count(*) from core.fct_series_monthly")[0][0],
